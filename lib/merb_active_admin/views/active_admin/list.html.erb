@@ -1,0 +1,44 @@
+<h1><%= @model.to_s %> List</h1>
+
+<table class="active_admin_listing">
+  <!-- Header Row -->
+  <tr>
+    <%- @model.columns.each do |col| -%>
+    <th><%= humanize(col) %></th>
+    <%- end -%>
+    <th>Edit</th>
+    <th>Delete</th>
+  </tr>
+
+  <!-- Data Rows -->
+  <%- @objects.each do |o| -%>
+  <tr>
+    <%- @model.columns.each do |col| -%>
+    <td><%= o.send(col) %></td>
+    <%- end -%>
+    <td><a href="<%= active_admin_url_with_id(:edit, o.pk) %>">edit</a></td>
+    <td><a href="<%= active_admin_url_with_id(:destroy, o.pk) %>">delete</a></td>
+  </tr>
+  <%- end -%>
+  
+</table>
+
+<%- if @paginated.prev_page -%><a href="<%= active_admin_url(:list, @model, :page => @paginated.prev_page, :per_page => params[:per_page]) %>">Previous</a><%- end -%>
+
+<%- if @paginated.prev_page and @paginated.next_page -%> | <%- end -%>
+
+<%- if @paginated.next_page -%><a href="<%= active_admin_url(:list, @model, :page => @paginated.next_page, :per_page => params[:per_page]) %>">Next</a><%- end -%>
+
+<%- if @objects.empty? -%>
+  <h2>Nothing to show</h2>
+<%- end -%>
+
+<%- throw_content :for_sidebar do -%>
+<div class="sidebar_top">
+  <dl class="sidebar_bottom">
+    <dt>Actions</dt>
+    <dd><a href="<%= active_admin_url(:new) %>">New <%= @model.to_s %></a></dd>
+    <dd><a href="<%= active_admin_home_url %>">Return to Index</a></dd>
+  </dl>
+</div>
+<%- end -%>

@@ -1,0 +1,4 @@
+merb_active_admin
+=================
+
+A plugin for the Merb framework that provides an out-of-the-box admin framework for your Sequel models.

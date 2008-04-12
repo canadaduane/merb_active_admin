@@ -1,0 +1,24 @@
+<h1>New <%= @model.to_s %></h1>
+
+<form name="new_<%= @model.to_s.downcase %>" action="<%= active_admin_url(:create) %>" method="post">
+  <table class="active_admin_object_form">
+    <%- @model.columns.reject{ |c| @model.primary_key == c }.each do |col| -%>
+    <tr>
+      <td class="active_admin_object_key"><%= humanize(col) %></td>
+      <td class="active_admin_object_value">
+        <input type="text" name="object[<%= col %>]" value="">
+      </td>
+    </tr>
+    <%- end -%>
+  </table>
+  <div class="active_admin_submit"><input type="submit" name="submit" value="Create" /></div>
+</form>
+
+<%- throw_content :for_sidebar do -%>
+<div class="sidebar_top">
+  <dl class="sidebar_bottom">
+    <dt>Actions</dt>
+    <dd><a href="#" onclick="history.go(-1); return false">Cancel</a></dd>
+  </dl>
+</div>
+<%- end -%>

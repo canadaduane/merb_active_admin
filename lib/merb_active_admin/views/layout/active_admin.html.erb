@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang='en' xml:lang='en' xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <title>Merb ActiveAdmin</title>
+    <link href="<%= active_admin_stylesheet_url("merb") %>" media="screen" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div id='header'>
+      <div class='wrap_to_center'>
+        <div id='logo'>
+          <img alt="Merb ActiveAdmin" src="<%= active_admin_file_url("header_logo.png") %>" />
+        </div>
+        <ul id='nav'>
+          <li><a href="<%= url(:active_admin_home) %>" id="active">Home</a></li>
+          <%- p(im = Merb::Plugins.config[:merb_active_admin][:header_models]) -%>
+          <%- for model in im -%>
+          <li><a href="<%= active_admin_url(:list, model) %>"><%= model.to_s %></a></li>
+          <%- end -%>
+        </ul>
+      </div>
+    </div>
+    <div id='content'>
+      <div class='wrap_to_center'>
+        <div id="content_top">
+          <div id="content_bottom">
+            <div id="content_main">
+            <%= catch_content :for_layout %>
+            </div>
+            <div id="content_sidebar">
+            <%= catch_content :for_sidebar %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer'>
+        <div class='wrap_to_center'>
+            <p>
+              &copy; 2008, Ezra Zygmuntowicz, Duane Johnson | Merb ActiveAdmin is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a>
+            </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

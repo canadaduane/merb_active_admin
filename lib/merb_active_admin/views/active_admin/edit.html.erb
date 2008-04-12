@@ -1,0 +1,24 @@
+<h1>Edit <%= @model.to_s %></h1>
+
+<form name="edit_<%= @model.to_s.downcase %>" action="<%= active_admin_url_with_id(:update, params[:id]) %>" method="post">
+  <table class="active_admin_object_form">
+    <%- @model.columns.reject{ |c| @model.primary_key == c }.each do |col| -%>
+    <tr>
+      <td class="active_admin_object_key"><%= humanize(col) %></td>
+      <td class="active_admin_object_value">
+        <input type="text" name="object[<%= col %>]" value="<%= @object.send(col) %>">
+      </td>
+    </tr>
+    <%- end -%>
+  </table>
+  <div class="active_admin_submit"><input type="submit" name="submit" value="Save" ></div>
+</form>
+
+<%- throw_content :for_sidebar do -%>
+<div class="sidebar_top">
+  <dl class="sidebar_bottom">
+    <dt>Actions</dt>
+    <dd><a href="#" onclick="history.go(-1); return false">Cancel</a></dd>
+  </dl>
+</div>
+<%- end -%>

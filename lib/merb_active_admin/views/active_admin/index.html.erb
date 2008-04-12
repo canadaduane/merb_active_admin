@@ -1,0 +1,20 @@
+<!-- Note that this template is used by the Base class only -->
+<h1>Home</h1>
+
+<ul>
+  <%- @models.each do |model| -%>
+  <li class="active-admin-index-item">
+    <a href="<%= active_admin_url(:list, model.to_s.downcase.to_sym) %>"><%= model.to_s %></a>
+  </li>
+  <%- end -%>
+</ul>
+
+<%- if @models.empty? -%>
+  <h2>There are no registered models in the application.</h2>
+  <p>To register a model, add the following include statement to your Sequel model:</p>
+  <pre><code>
+    class MyModel &lt; Sequel::Model
+      include ActiveAdmin
+    end
+  </code></pre>
+<%- end -%>
