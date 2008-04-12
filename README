@@ -1,4 +1,6 @@
-merb_active_admin
+Merb ActiveAdmin 0.3.0
 =================
 
 A plugin for the Merb framework that provides an out-of-the-box admin framework for your Sequel models.
+
+This version of ActiveAdmin provides basic scaffolding of models as an admin tool.
