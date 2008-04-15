@@ -30,28 +30,32 @@ if defined?(Merb::Plugins)
     
     # Register route
     Merb::Router.prepend do |r|
+      base_path = Merb::Plugins.config[:merb_active_admin][:base_path]
       # Match anything for resource and file fetching within our pseudo-public dir.
       # Regexp matched routes cannot be named routes, so we have some helper methods in Base.
-      r.match(%r{^/#{Regexp.escape(Merb::Plugins.config[:merb_active_admin][:base_path])}/public/(.*)$}).
+      r.match(%r{^/#{Regexp.escape(base_path)}/public/(.*)$}).
         to(:controller => "active_admin/assets", :action => "public", :file => "[1]")
 
-      r.match(%r{^/#{Regexp.escape(Merb::Plugins.config[:merb_active_admin][:base_path])}/stylesheet/(.*)$}).
+      r.match(%r{^/#{Regexp.escape(base_path)}/stylesheet/(.*)$}).
         to(:controller => "active_admin/assets", :action => "stylesheet", :file => "[1]")
 
       # Next, match the home page...
-      r.match("/#{Merb::Plugins.config[:merb_active_admin][:base_path]}").
+      r.match("/#{base_path}").
         to(:controller => "active_admin/base", :action => "index").
         name(:active_admin_home)
       
-      # ... actions without IDs ...
-      r.match("/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/:controller/:action").
-        to(:controller => "active_admin/:controller").
-        name(:active_admin_action)
+      # ... 'destroy' action with multiple ids
+      r.match(%r{^/#{Regexp.escape(base_path)}/([^/]+)/(destroy)/(.+)$}).
+        to(:controller => "active_admin/[1]", :action => "[2]", :ids => "[3]")
 
-      # ... and finally, actions with ids
-      r.match("/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/:controller/:action/:id").
-        to(:controller => "active_admin/:controller").
-        name(:active_admin_action_id)
+      # ... actions without ID ...
+      r.match("/#{base_path}/:controller/:action").
+        to(:controller => "active_admin/:controller")
+
+      # ... actions with ID ...
+      r.match("/#{base_path}/:controller/:action/:id").
+        to(:controller => "active_admin/:controller")
+
 
     end
     

@@ -9,7 +9,16 @@ class :controller_class < Base
     @objects = @paginated.all
     active_admin_render(:list)
   end
-
+  
+  def list_data(page = 1, per_page = 15)
+    per_page = params[:rp] if params[:rp]
+    sort_by = (params[:sortname] || "id").to_sym
+    order = params[:sortorder] == "asc" ? :order : :reverse_order
+    @paginated = @model.send(order, sort_by).paginate(page.to_i, per_page.to_i)
+    @objects = @paginated.all
+    active_admin_render(:list_data, "json", false)
+  end
+  
   def show(id)
     @object = @model[id]
     raise NotFound, "#{@model} #{id} not found" if @object.nil?
@@ -36,9 +45,10 @@ class :controller_class < Base
     redirect active_admin_url(:list)
   end
 
-  def destroy(id)
-    @model[id].destroy
-    redirect active_admin_url(:list)
+  def destroy(ids)
+    ids.split(",").each{ |id| puts "DESTROY ID: #{id.inspect}"; @model[id].destroy }
+    self.content_type = :json
+    %([message: "ok"])
   end
   
   private

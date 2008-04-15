@@ -17,11 +17,13 @@ module ActiveAdmin
     # URL builder methods
   
     def active_admin_url(action, model = @model, kvs = {})
+      kvs.delete_if{ |k, v| v.nil? }
       "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/#{model.to_s.downcase}s/#{action}" +
       (kvs.empty? ? "" : "?#{Merb::Request.params_to_query_string(kvs)}")
     end
 
     def active_admin_url_with_id(action, id, model = @model, kvs = {})
+      kvs.delete_if{ |k, v| v.nil? }
       "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/#{model.to_s.downcase}s/#{action}/#{id}" +
       (kvs.empty? ? "" : "?#{Merb::Request.params_to_query_string(kvs)}")
     end
@@ -47,6 +49,17 @@ module ActiveAdmin
     def active_admin_render(action, type = "html", layout = true)
       render nil, :template => "active_admin/#{action}.#{type}",
                   :layout   => (layout ? "active_admin" : nil)
+    end
+
+    def active_admin_partial(template, locals = {})
+      (@_old_partial_locals ||= []).push @_merb_partial_locals
+      @_merb_partial_locals = locals
+      template_method, template_location =
+        _template_for("_#{template}", "html", "active_admin",
+          :template => "active_admin/_#{template}.html")
+      sent_template = send(template_method)
+      @_merb_partial_locals = @_old_partial_locals.pop
+      sent_template
     end
     
     def humanize(word)

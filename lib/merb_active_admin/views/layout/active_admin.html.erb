@@ -3,6 +3,10 @@
   <head>
     <title>Merb ActiveAdmin</title>
     <link href="<%= active_admin_stylesheet_url("merb") %>" media="screen" rel="stylesheet" type="text/css" />
+    <link href="<%= active_admin_stylesheet_url("facebox") %>" media="screen" rel="stylesheet" type="text/css" />
+    <script src="<%= active_admin_file_url("jquery-1.2.3.js") %>" type="text/javascript" charset="utf-8"></script>
+    <script src="<%= active_admin_file_url("facebox/facebox.js") %>" type="text/javascript" charset="utf-8"></script>
+    <%= catch_content :for_head %>
   </head>
   <body>
     <div id='header'>
@@ -11,10 +15,10 @@
           <img alt="Merb ActiveAdmin" src="<%= active_admin_file_url("header_logo.png") %>" />
         </div>
         <ul id='nav'>
-          <li><a href="<%= url(:active_admin_home) %>" id="active">Home</a></li>
+          <li><a href="<%= url(:active_admin_home) %>" <%= @model.nil? ? "id=\"active\"" : ""%>>Home</a></li>
           <%- p(im = Merb::Plugins.config[:merb_active_admin][:header_models]) -%>
           <%- for model in im -%>
-          <li><a href="<%= active_admin_url(:list, model) %>"><%= model.to_s %></a></li>
+          <li><a href="<%= active_admin_url(:list, model) %>" <%= @model.to_s == model.to_s ? "id=\"active\"" : ""%>><%= model.to_s %></a></li>
           <%- end -%>
         </ul>
       </div>
@@ -23,11 +27,12 @@
       <div class='wrap_to_center'>
         <div id="content_top">
           <div id="content_bottom">
-            <div id="content_main">
+            <%- sidebar = catch_content :for_sidebar -%>
+            <div id="content_main" style="<%= sidebar ?  "" : "width:760px" %>">
             <%= catch_content :for_layout %>
             </div>
             <div id="content_sidebar">
-            <%= catch_content :for_sidebar %>
+              <%= sidebar %>
             </div>
           </div>
         </div>

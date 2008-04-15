@@ -1,0 +1,20 @@
+<table id="table1">
+  <!-- Header Row -->
+  <thead>
+    <tr>
+      <%- model.columns.each do |col| -%>
+      <th><%= humanize(col) %></th>
+      <%- end -%>
+    </tr>
+  </thead>
+  <!-- Data Rows -->
+  <tbody>
+    <%- objects.each do |o| -%>
+    <tr>
+      <%- model.columns.each do |col| -%>
+      <td><%= o.send(col) %></td>
+      <%- end -%>
+    </tr>
+    <%- end -%>
+  </tbody>
+</table>

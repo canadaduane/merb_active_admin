@@ -44,7 +44,7 @@ caption, th, td {text-align: left;font-weight: normal; }
   background: url(<%= active_admin_file_url("content_bottom.gif") %>) no-repeat bottom center;
   width:100%;
   float:left;
-  min-height: 300px;
+  min-height: 527px;
 }
 #content_main {
   float:left;
@@ -73,9 +73,9 @@ caption, th, td {text-align: left;font-weight: normal; }
 #header a:hover {color:#000;}
 ul#nav {float:right;display:block;width:43.3em;margin-top:25px;}
 ul#nav li {display:block;float:left;}
-ul#nav li a {display:block;float:left;margin:0px 5px;padding:6px 9px 31px 9px;}
+ul#nav li a {display:block;float:left;margin:0px 5px;padding:6px 9px 31px 9px; outline:none}
 ul#nav li a:hover {background:url(<%= active_admin_file_url("header_hover.gif") %>) repeat-x bottom center;}
-ul#nav li a#active {background:url(<%= active_admin_file_url("header_arrow.gif") %>)no-repeat bottom center;}
+ul#nav li a#active {background:url(<%= active_admin_file_url("header_arrow.gif") %>) no-repeat bottom center;}
 ul#nav li.last a {margin-right:0;}
 
 /*  TEXT FORMATTING  */
@@ -209,4 +209,15 @@ ul.quicklinks_bottom li {
 .active_admin_submit {
   text-align: center;
   margin-top: 1.5em;
+}
+
+/* Buttons */
+.list_header_button a {
+  float: right;
+  font-size: 20px;
+  text-decoration: none;
+  outline: none;
+  padding: 0px 7px;
+  border-left: 1px solid #999;
+  border-right: 1px solid #999;
 }

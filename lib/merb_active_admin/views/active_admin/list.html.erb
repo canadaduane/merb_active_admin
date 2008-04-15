@@ -1,44 +1,96 @@
-<h1><%= @model.to_s %> List</h1>
+<h1>
+  <div class="list_header_button"><a href="#delete-box" rel="facebox">Delete</a></div>
+  <div class="list_header_button"><a href="#" onclick="editSelectedRow(); return false">Edit</a></div>
+  <div class="list_header_button"><a href="<%= active_admin_url(:new) %>">New <%= @model.to_s %></a></div>
+  <%= @model.to_s %> List
+</h1>
 
-<table class="active_admin_listing">
-  <!-- Header Row -->
-  <tr>
-    <%- @model.columns.each do |col| -%>
-    <th><%= humanize(col) %></th>
-    <%- end -%>
-    <th>Edit</th>
-    <th>Delete</th>
-  </tr>
-
-  <!-- Data Rows -->
-  <%- @objects.each do |o| -%>
-  <tr>
-    <%- @model.columns.each do |col| -%>
-    <td><%= o.send(col) %></td>
-    <%- end -%>
-    <td><a href="<%= active_admin_url_with_id(:edit, o.pk) %>">edit</a></td>
-    <td><a href="<%= active_admin_url_with_id(:destroy, o.pk) %>">delete</a></td>
-  </tr>
-  <%- end -%>
-  
-</table>
-
-<%- if @paginated.prev_page -%><a href="<%= active_admin_url(:list, @model, :page => @paginated.prev_page, :per_page => params[:per_page]) %>">Previous</a><%- end -%>
-
-<%- if @paginated.prev_page and @paginated.next_page -%> | <%- end -%>
-
-<%- if @paginated.next_page -%><a href="<%= active_admin_url(:list, @model, :page => @paginated.next_page, :per_page => params[:per_page]) %>">Next</a><%- end -%>
+<div id="delete-box" class="dialog" style="display:none">
+  Are you sure you want to delete the row(s)?
+  <div class="footer">
+    <!-- <a href="#" class="close">&nbsp;</a> -->
+    <a href="#" onclick="$(document).trigger('close.facebox'); deleteSelectedRows(); return false">Delete</a>
+    <a href="#" onclick="$(document).trigger('close.facebox'); return false">Cancel</a>
+  </div>
+</div>
 
 <%- if @objects.empty? -%>
   <h2>Nothing to show</h2>
+<%- else -%>
+  <table class="listing">
+    <!-- Header Row -->
+    <thead>
+      <tr>
+        <%- @model.columns.each do |col| -%>
+        <th abbr="<%= col %>" width="<%= col.to_s == "id" ? 35 : 100 %>"><%= humanize(col) %></th>
+        <%- end -%>
+      </tr>
+    </thead>
+
+    <!-- Data Rows -->
+    <tbody>
+      <%- @objects.each do |o| -%>
+      <tr>
+        <%- @model.columns.each do |col| -%>
+        <td><%= o.send(col) %></td>
+        <%- end -%>
+      </tr>
+      <%- end -%>
+    </tbody>
+  </table>
 <%- end -%>
 
-<%- throw_content :for_sidebar do -%>
-<div class="sidebar_top">
-  <dl class="sidebar_bottom">
-    <dt>Actions</dt>
-    <dd><a href="<%= active_admin_url(:new) %>">New <%= @model.to_s %></a></dd>
-    <dd><a href="<%= active_admin_home_url %>">Return to Index</a></dd>
-  </dl>
-</div>
+<%- throw_content :for_head do -%>
+  <script src="<%= active_admin_file_url("flexigrid/flexigrid.js") %>" type="text/javascript" charset="utf-8"></script>
+  <link rel="stylesheet" href="<%= active_admin_stylesheet_url("flexigrid") %>" type="text/css" media="screen" title="Flexigrid CSS" charset="utf-8">
 <%- end -%>
+
+<script type="text/javascript" charset="utf-8">
+  $(".listing").flexigrid({
+    height:        'auto',
+    stripe:        true,
+    showToggleBtn: false,
+    autoload:      true,
+    
+    usepager:      true,
+    page:          <%= @paginated.current_page %>,
+    total:         <%= @paginated.page_count %>,
+    rp:            <%= params[:per_page] || 15 %>,
+    
+    url:           "<%= active_admin_url(:list_data) %>",
+    dataType:      "json",
+
+    sortname:      "id",
+    sortorder:     "asc"
+  });
+
+  function getSelectedIDs() {
+    var ids = [];
+    $(".trSelected").each(function(i, row) {
+      var match = row.id.match(/row(\d+)/)
+      if( match ) ids.push(match[1]);
+    });
+    return ids;
+  }
+  
+  function deleteSelectedRows() {
+    var ids = getSelectedIDs();
+    if( ids.length == 0 ) {
+      // No rows to delete
+    } else {
+      $.post("<%= active_admin_url(:destroy) %>/" + ids.join(","), null, null, "json");
+      $(".listing").flexReload();
+    }
+  }
+  
+  function editSelectedRow() {
+    var ids = getSelectedIDs();
+    if( ids.length == 0 ) {
+      // No row to edit
+    } else if( ids.length == 1 ) {
+      window.location = "<%= active_admin_url(:edit) %>/" + ids[0];
+    } else {
+      // Too many rows selected
+    }
+  }
+</script>

@@ -1,0 +1,11 @@
+<%=
+  { "page"  => @paginated.current_page,
+    "total" => @paginated.pagination_record_count,
+    "rows"  =>
+      @objects.map{ |o|
+        { "id"   => o.id,
+          "cell" => @model.columns.map{ |c| o.send( c ) }
+        }
+      }
+  }.to_json
+%>
