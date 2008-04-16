@@ -1,5 +1,5 @@
 <h1>
-  <div class="list_header_button"><a href="#delete-box" rel="facebox">Delete</a></div>
+  <div class="list_header_button"><a href="#" onclick="confirmDelete(); return false">Delete</a></div>
   <div class="list_header_button"><a href="#" onclick="editSelectedRow(); return false">Edit</a></div>
   <div class="list_header_button"><a href="<%= active_admin_url(:new) %>">New <%= @model.to_s %></a></div>
   <%= @model.to_s %> List
@@ -9,7 +9,7 @@
   Are you sure you want to delete the row(s)?
   <div class="footer">
     <!-- <a href="#" class="close">&nbsp;</a> -->
-    <a href="#" onclick="$(document).trigger('close.facebox'); deleteSelectedRows(); return false">Delete</a>
+    <a href="#" onclick="$(document).trigger('close.facebox'); deleteSelectedRows(); return false">Yes, Delete</a> |
     <a href="#" onclick="$(document).trigger('close.facebox'); return false">Cancel</a>
   </div>
 </div>
@@ -73,24 +73,29 @@
     return ids;
   }
   
-  function deleteSelectedRows() {
+  function confirmDelete() {
     var ids = getSelectedIDs();
     if( ids.length == 0 ) {
-      // No rows to delete
+      $.facebox("Select one or more rows to delete, then click this 'Delete' button.");
     } else {
-      $.post("<%= active_admin_url(:destroy) %>/" + ids.join(","), null, null, "json");
-      $(".listing").flexReload();
+      $.facebox($('#delete-box'));
     }
+  }
+  
+  function deleteSelectedRows() {
+    var ids = getSelectedIDs();
+    $.post("<%= active_admin_url(:destroy) %>/" + ids.join(","), null, null, "json");
+    $(".listing").flexReload();
   }
   
   function editSelectedRow() {
     var ids = getSelectedIDs();
     if( ids.length == 0 ) {
-      // No row to edit
+      $.facebox("Select a row to edit, then click this 'Edit' button.");
     } else if( ids.length == 1 ) {
       window.location = "<%= active_admin_url(:edit) %>/" + ids[0];
     } else {
-      // Too many rows selected
+      $.facebox("More than one row has been selected.  Just pick one row and then click this 'Edit' button.");
     }
   }
 </script>
