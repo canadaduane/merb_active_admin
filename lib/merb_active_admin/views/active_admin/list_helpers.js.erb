@@ -23,7 +23,8 @@ function getSelectedIDs(table_name) {
   return ids;
 }
 
-function confirmDelete() {
+function faceboxForDelete(table_name) {
+  setFaceboxTableName(table_name, "confirmDelete");
   var ids = getSelectedIDs();
   if( ids.length == 0 ) {
     $.facebox("Select one or more rows to delete, then click this 'Delete' button.");
@@ -32,13 +33,8 @@ function confirmDelete() {
   }
 }
 
-function deleteSelectedRows() {
-  var ids = getSelectedIDs();
-  $.post("<%= active_admin_url(:destroy) %>/" + ids.join(","), null, null, "json");
-  $(".listing").flexReload();
-}
-
-function editSelectedRow() {
+function faceboxForEdit(table_name) {
+  setFaceboxTableName(table_name, "editSelectedRow");
   var ids = getSelectedIDs();
   if( ids.length == 0 ) {
     $.facebox("Select a row to edit, then click this 'Edit' button.");
@@ -46,5 +42,23 @@ function editSelectedRow() {
     window.location = "<%= active_admin_url(:edit) %>/" + ids[0];
   } else {
     $.facebox("More than one row has been selected.  Just pick one row and then click this 'Edit' button.");
+  }
+}
+
+// Actually do the ajax call to delete rows
+function deleteSelectedRows(table_name) {
+  var ids = getSelectedIDs(table_name);
+  var url = "<%= active_admin_home_url %>/" + table_name + "/destroy/" + ids.join(",");
+  $.post(url, null, null, "json");
+  $("#table_" + table_name).flexReload();
+}
+
+function setFaceboxTableName(table_name, callingFunction) {
+  if (!table_name) {
+    alert(callingFunction + " requires table_name");
+    return;
+  } else {
+    // Global variable just for facebox
+    faceboxTableName = table_name;
   }
 }
