@@ -22,7 +22,7 @@ module ActiveAdmin
   # Adds a controller class for each model that is registered as an ActiveAdmin model
   def self.make_scaffold!
     for receiver in @@models
-      module_eval action_template(:model_class => receiver.to_s, :controller_class => "#{receiver}s")
+      module_eval action_template(:model_class => receiver.to_s, :controller_class => "#{receiver.to_s.pluralize}")
     end
   end
 end

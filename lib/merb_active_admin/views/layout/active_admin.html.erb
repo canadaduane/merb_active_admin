@@ -15,7 +15,7 @@
           <img alt="Merb ActiveAdmin" src="<%= active_admin_file_url("header_logo.png") %>" />
         </div>
         <ul id='nav'>
-          <li><a href="<%= url(:active_admin_home) %>" <%= @model.nil? ? "id=\"active\"" : ""%>>Home</a></li>
+          <li><a href="<%= active_admin_home_url %>" <%= @model.nil? ? "id=\"active\"" : ""%>>Home</a></li>
           <%- p(im = Merb::Plugins.config[:merb_active_admin][:header_models]) -%>
           <%- for model in im -%>
           <li><a href="<%= active_admin_url(:list, model) %>" <%= @model.to_s == model.to_s ? "id=\"active\"" : ""%>><%= model.to_s %></a></li>

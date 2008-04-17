@@ -17,5 +17,11 @@ module ActiveAdmin
       self.content_type = :css
       active_admin_render(file, "css", false)
     end
+
+    # Dynamically create javascript
+    def javascript(file)
+      self.content_type = :js
+      active_admin_render(file, "js", false)
+    end
   end
 end

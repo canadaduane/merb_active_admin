@@ -18,22 +18,30 @@ module ActiveAdmin
   
     def active_admin_url(action, model = @model, kvs = {})
       kvs.delete_if{ |k, v| v.nil? }
-      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/#{model.to_s.downcase}s/#{action}" +
+      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/#{model.to_s.downcase.pluralize}/#{action}" +
       (kvs.empty? ? "" : "?#{Merb::Request.params_to_query_string(kvs)}")
     end
 
     def active_admin_url_with_id(action, id, model = @model, kvs = {})
       kvs.delete_if{ |k, v| v.nil? }
-      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/#{model.to_s.downcase}s/#{action}/#{id}" +
+      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/#{model.to_s.downcase.pluralize}/#{action}/#{id}" +
       (kvs.empty? ? "" : "?#{Merb::Request.params_to_query_string(kvs)}")
     end
     
+    def active_admin_association_url(association, id, model = @model)
+      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/#{model.to_s.downcase.pluralize}-to-#{association}/#{id}"
+    end
+    
     def active_admin_home_url
-      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/base/index"
+      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}"
     end
 
     def active_admin_stylesheet_url(resource)
       "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/stylesheet/#{resource}"
+    end
+
+    def active_admin_javascript_url(resource)
+      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/javascript/#{resource}"
     end
 
     def active_admin_file_url(resource)

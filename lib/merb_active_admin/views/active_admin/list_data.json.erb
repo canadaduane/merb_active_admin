@@ -1,6 +1,6 @@
 <%=
-  { "page"  => @paginated.current_page,
-    "total" => @paginated.pagination_record_count,
+  { "page"  => (@paginated.current_page rescue 0),
+    "total" => (@paginated.pagination_record_count rescue 0),
     "rows"  =>
       @objects.map{ |o|
         { "id"   => o.id,

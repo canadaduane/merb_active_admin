@@ -1,0 +1,43 @@
+<h1>
+  <div class="list_header_button"><a href="#" onclick="confirmDelete(); return false">Delete</a></div>
+  <div class="list_header_button"><a href="#" onclick="editSelectedRow(); return false">Edit</a></div>
+  <div class="list_header_button"><a href="<%= active_admin_url(:new) %>">New <%= model.to_s %></a></div>
+  <%= model.to_s %> List
+</h1>
+
+<table id="table_<%= name %>" class="active_admin_table">
+  <!-- Header Row -->
+  <thead>
+    <tr>
+      <%- model.columns.each do |col| -%>
+      <th abbr="<%= col %>" width="<%= col.to_s == "id" ? 35 : 100 %>"><%= humanize(col) %></th>
+      <%- end -%>
+    </tr>
+  </thead>
+
+  <!-- Data Rows -->
+  <tbody>
+  </tbody>
+</table>
+
+<script type="text/javascript" charset="utf-8">
+  $("#table_<%= name %>").flexigrid({
+    <%- if association -%>
+    association:   "<%= association %>",
+    <%- end -%>
+    <%- if data_url -%>
+    url:           "<%= data_url %>",
+    <%- end -%>
+    <%- if click_js -%>
+    onRowClick:    function(e) { <%= click_js %> },
+    <%- end -%>
+    height:        'auto',
+    stripe:        true,
+    showToggleBtn: false,
+    autoload:      true,
+    usepager:      true,
+    dataType:      "json",
+    sortname:      "id",
+    sortorder:     "asc"
+  });
+</script>

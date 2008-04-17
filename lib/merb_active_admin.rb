@@ -1,6 +1,16 @@
 # make sure we're running inside Merb
 if defined?(Merb::Plugins)
-
+  def Merb.active_admin_default_header_models
+    hm = Merb::Plugins.config[:merb_active_admin][:header_models]
+    if hm.empty?
+      # Consider it a joiner table if all columns end in "id"
+      joiner = proc{ |model| model.columns.all?{ |c| c.to_s =~ /id$/ } }
+      defaults = ActiveAdmin.registered_models.reject{ |m| joiner[m] }
+      # Use the first 5 non-joiner tables as defaults
+      hm.replace defaults[0..4]
+    end
+  end
+  
   # Merb gives you a Merb::Plugins.config hash...feel free to put your stuff in your piece of it
   Merb::Plugins.config[:merb_active_admin] = {
     
@@ -25,8 +35,7 @@ if defined?(Merb::Plugins)
     end
     
     # Set default important models
-    hm = Merb::Plugins.config[:merb_active_admin][:header_models]
-    hm.replace ActiveAdmin.registered_models[0..4] if hm.empty?
+    Merb.active_admin_default_header_models
     
     # Register route
     Merb::Router.prepend do |r|
@@ -39,20 +48,27 @@ if defined?(Merb::Plugins)
       r.match(%r{^/#{Regexp.escape(base_path)}/stylesheet/(.*)$}).
         to(:controller => "active_admin/assets", :action => "stylesheet", :file => "[1]")
 
+      r.match(%r{^/#{Regexp.escape(base_path)}/javascript/(.*)$}).
+        to(:controller => "active_admin/assets", :action => "javascript", :file => "[1]")
+
       # Next, match the home page...
       r.match("/#{base_path}").
-        to(:controller => "active_admin/base", :action => "index").
-        name(:active_admin_home)
+        to(:controller => "active_admin/base", :action => "index")
       
-      # ... 'destroy' action with multiple ids
+      # List data for associations, e.g. /active_admin/users/to/posts/1+2+3
+      r.match(%r{^/#{Regexp.escape(base_path)}/([^/]+)-to-([^/]+)/(.+)$}).
+        to(:controller => "active_admin/[1]", :action => "list_association",
+           :association => "[2]", :id => "[3]")
+      
+      # ... 'destroy' action with multiple ids, e.g. /active_admin/users/destroy/3+21
       r.match(%r{^/#{Regexp.escape(base_path)}/([^/]+)/(destroy)/(.+)$}).
         to(:controller => "active_admin/[1]", :action => "[2]", :ids => "[3]")
 
-      # ... actions without ID ...
+      # ... actions without ID, e.g. /active_admin/users/list
       r.match("/#{base_path}/:controller/:action").
         to(:controller => "active_admin/:controller")
 
-      # ... actions with ID ...
+      # ... actions with ID, e.g. /active_admin/users/update/1
       r.match("/#{base_path}/:controller/:action/:id").
         to(:controller => "active_admin/:controller")
 

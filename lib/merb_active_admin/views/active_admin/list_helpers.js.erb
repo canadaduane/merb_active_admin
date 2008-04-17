@@ -1,0 +1,50 @@
+function clickedTableRow(table_name) {
+  $(".active_admin_table").each(function(i, grid_element) {
+    var options = grid_element.p;
+    if (grid_element.id != ("table_" + table_name)) {
+      var association = options['association'];
+      var ids = getSelectedIDs(table_name);
+      var url = "<%= active_admin_home_url %>/" + table_name + "-to-" + association + "/" + ids[0];
+      thegrid = grid_element;
+      grid_element.p['url'] = url;
+      grid_element.grid.populate();
+    }
+  });
+}
+
+function getSelectedIDs(table_name) {
+  var ids = [];
+  var rows = ".trSelected";
+  if (table_name) rows = "#table_" + table_name + " " + rows
+  $(rows).each(function(i, row) {
+    var match = row.id.match(/row(\d+)/)
+    if( match ) ids.push(match[1]);
+  });
+  return ids;
+}
+
+function confirmDelete() {
+  var ids = getSelectedIDs();
+  if( ids.length == 0 ) {
+    $.facebox("Select one or more rows to delete, then click this 'Delete' button.");
+  } else {
+    $.facebox($('#confirm-delete-rows-box'));
+  }
+}
+
+function deleteSelectedRows() {
+  var ids = getSelectedIDs();
+  $.post("<%= active_admin_url(:destroy) %>/" + ids.join(","), null, null, "json");
+  $(".listing").flexReload();
+}
+
+function editSelectedRow() {
+  var ids = getSelectedIDs();
+  if( ids.length == 0 ) {
+    $.facebox("Select a row to edit, then click this 'Edit' button.");
+  } else if( ids.length == 1 ) {
+    window.location = "<%= active_admin_url(:edit) %>/" + ids[0];
+  } else {
+    $.facebox("More than one row has been selected.  Just pick one row and then click this 'Edit' button.");
+  }
+}

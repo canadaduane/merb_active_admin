@@ -10,13 +10,25 @@ class :controller_class < Base
     active_admin_render(:list)
   end
   
-  def list_data(page = 1, per_page = 15)
-    per_page = params[:rp] if params[:rp]
-    sort_by = (params[:sortname] || "id").to_sym
-    order = params[:sortorder] == "asc" ? :order : :reverse_order
+  def list_data(page = 1)
+    per_page, sort_by, order = flexigrid_params
     @paginated = @model.send(order, sort_by).paginate(page.to_i, per_page.to_i)
     @objects = @paginated.all
     active_admin_render(:list_data, "json", false)
+  end
+  
+  def list_association(id, association, page = 1)
+    per_page, sort_by, order = flexigrid_params
+    if object = @model[id]
+      query = object.send(association)
+      @paginated = query.send(order, "#{association}__#{sort_by}".to_sym).paginate(page.to_i, per_page.to_i)
+      @objects = @paginated.all
+      @model = @model.association_reflection(association.to_sym)[:class_name].constantize
+      active_admin_render(:list_data, "json", false)
+    else
+      @objects = []
+      active_admin_render(:list_data, "json", false)
+    end
   end
   
   def show(id)
@@ -51,9 +63,16 @@ class :controller_class < Base
     %([message: "ok"])
   end
   
-  private
+  protected
   
   def set_model_class
     @model = :model_class
+  end
+  
+  def flexigrid_params
+    per_page = params[:per_page] || params[:rp] || 15
+    sort_by = (params[:sortname] || "id").to_sym
+    order = params[:sortorder] == "asc" ? :order : :reverse_order
+    [per_page, sort_by, order]
   end
 end
