@@ -1,16 +1,9 @@
-<h1>
-  <div class="list_header_button"><a href="#" onclick="faceboxForDelete('<%= association || name %>'); return false">Delete</a></div>
-  <div class="list_header_button"><a href="#" onclick="faceboxForEdit('<%= association || name %>); return false">Edit</a></div>
-  <div class="list_header_button"><a href="<%= active_admin_url(:new) %>">New <%= humanize( name ).singularize %></a></div>
-  <%= (association ? "Related " : "") + humanize( name ) %>
-</h1>
-
-<table id="table_<%= name %>" class="active_admin_table">
+<table id="table_<%= table_name %>" class="table_<%= table_type %>">
   <!-- Header Row -->
   <thead>
     <tr>
       <%- model.columns.each do |col| -%>
-      <th abbr="<%= col %>" width="<%= col.to_s == "id" ? 35 : 100 %>"><%= humanize(col) %></th>
+      <th abbr="<%= col %>" width="<%= col.to_s == "id" ? 35 : 100 %>"><%= underscored_to_human_readable(col) %></th>
       <%- end -%>
     </tr>
   </thead>
@@ -19,25 +12,3 @@
   <tbody>
   </tbody>
 </table>
-
-<script type="text/javascript" charset="utf-8">
-  $("#table_<%= name %>").flexigrid({
-    <%- if association -%>
-    association:   "<%= association %>",
-    <%- end -%>
-    <%- if data_url -%>
-    url:           "<%= data_url %>",
-    <%- end -%>
-    <%- if click_js -%>
-    onRowClick:    function(e) { <%= click_js %> },
-    <%- end -%>
-    height:        'auto',
-    stripe:        true,
-    showToggleBtn: false,
-    autoload:      true,
-    usepager:      true,
-    dataType:      "json",
-    sortname:      "id",
-    sortorder:     "asc"
-  });
-</script>

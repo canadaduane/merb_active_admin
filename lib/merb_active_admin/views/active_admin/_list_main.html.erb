@@ -1,0 +1,47 @@
+<div id="main_wrapper">
+  <h1>
+    <div class="list_header_button">
+      <a href="#" onclick="attemptDelete('<%= name %>'); return false">
+        Delete Selected
+      </a>
+    </div>
+
+
+    <div class="list_header_button">
+      <a href="#" onclick="attemptEdit('<%= name %>); return false">
+        Edit Selected
+      </a>
+    </div>
+
+
+    <div class="list_header_button">
+      <a href="<%= active_admin_url(:new) %>">
+        New <%= camelized_to_human_readable( model.to_s ) %>
+      </a>
+    </div>
+  
+    <!-- Show the name of this list of data -->
+    <%= camelized_to_human_readable( model.to_s.pluralize ) %>
+  </h1>
+
+  <%= active_admin_partial :data_table,
+        :table_type => "main",
+        :table_name => name,
+        :model      => model %>
+
+  <script type="text/javascript" charset="utf-8">
+    $("#table_<%= name %>").flexigrid({
+      url:           "<%= data_url %>",
+      onRowClick:    function(e)
+        { clickedMainTableRow('<%= name %>'); },
+      height:        'auto',
+      stripe:        true,
+      showToggleBtn: false,
+      autoload:      true,
+      usepager:      true,
+      dataType:      "json",
+      sortname:      "id",
+      sortorder:     "asc"
+    });
+  </script>
+</div>

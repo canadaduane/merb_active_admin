@@ -1,0 +1,61 @@
+<div id="<%= association_name %>_wrapper">
+  <h1>
+    
+    <!-- Disassociate one or more of this table's rows from the main selected row -->
+    <div class="list_header_button disassociate_context disassociate_button">
+      <a href="#" onclick="attemptDisassociate('<%= controller_for_model(main_model) %>', '<%= association_name %>'); return false">
+        Disassociate
+      </a>
+    </div>
+    
+    <!-- Associate one or more of this table's rows with the main selected row -->
+    <div class="list_header_button associate_context associate_button" style="display:none">
+      <a href="#" onclick="attemptAssociate('<%= controller_for_model(main_model) %>', '<%= association_name %>'); return false">
+        Associate
+      </a>
+    </div>
+
+    <!-- Switch to 'associate' mode by showing all objects in this table -->
+    <div class="list_header_button disassociate_context show_all_button">
+      <a href="#" onclick="showAll('<%= association_name %>'); return false">
+        Show All
+      </a>
+    </div>
+    
+    <!-- Switch to 'disassociate' mode by showing only associated objects in this table -->
+    <div class="list_header_button associate_context associated_only_button" style="display:none">
+      <a href="#" onclick="showAssociatedOnly('<%= association_name %>'); return false">
+        Associated Only
+      </a>
+    </div>
+    
+    <!-- The name of this list of associated data -->
+    <%= camelized_to_human_readable( associated_model.to_s.pluralize ) %>
+  </h1>
+
+  <%= active_admin_partial :data_table,
+        :table_type => "association",
+        :table_name => association_name,
+        :model      => associated_model %>
+
+  <script type="text/javascript" charset="utf-8">
+    $("#table_<%= association_name %>").flexigrid({
+      generateUrl:   function(id) {
+        $("#table_<%= association_name %>").flexOptions({
+          url: "/" +
+            "<%= active_admin_module %>/" +
+            "<%= controller_for_model(main_model) %>-to-" +
+            "<%= controller_for_model(associated_model) %>/" + id
+        });
+      },
+      height:        'auto',
+      stripe:        true,
+      showToggleBtn: false,
+      autoload:      true,
+      usepager:      true,
+      dataType:      "json",
+      sortname:      "id",
+      sortorder:     "asc"
+    });
+  </script>
+</div>

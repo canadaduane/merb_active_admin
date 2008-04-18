@@ -1,5 +1,7 @@
-# Note: This file is read in by active_admin.rb and several of the :symbols are replaced
-#       with meaningful Ruby classes and values.
+# Note: This file is read in by active_admin.rb and the following symbols are replaced
+# with meaningful Ruby classes and values:
+#   :controller_class - the class of the controller, which is model.to_s.pluralize by default
+#   :model_class      - the class of the Sequel model 
 
 class :controller_class < Base
   before :set_model_class
@@ -20,7 +22,7 @@ class :controller_class < Base
   def list_association(id, association, page = 1)
     per_page, sort_by, order = flexigrid_params
     if object = @model[id]
-      query = object.send(association)
+      query = object.send("#{association}_dataset")
       @paginated = query.send(order, "#{association}__#{sort_by}".to_sym).paginate(page.to_i, per_page.to_i)
       @objects = @paginated.all
       @model = @model.association_reflection(association.to_sym)[:class_name].constantize
@@ -29,6 +31,16 @@ class :controller_class < Base
       @objects = []
       active_admin_render(:list_data, "json", false)
     end
+  end
+  
+  def associate(id, association, assoc_ids)
+    do_association_method(id, association, assoc_ids, :add)
+    %({message: "ok"})
+  end
+
+  def disassociate(id, association, assoc_ids)
+    do_association_method(id, association, assoc_ids, :remove)
+    %({message: "ok"})
   end
   
   def show(id)
@@ -58,14 +70,15 @@ class :controller_class < Base
   end
 
   def destroy(ids)
-    ids.split(",").each{ |id| puts "DESTROY ID: #{id.inspect}"; @model[id].destroy }
+    ids.split(",").each{ |id| @model[id].destroy }
     self.content_type = :json
-    %([message: "ok"])
+    %({message: "ok"})
   end
   
   protected
   
   def set_model_class
+    # See comment at beginning of file
     @model = :model_class
   end
   
@@ -75,4 +88,20 @@ class :controller_class < Base
     order = params[:sortorder] == "asc" ? :order : :reverse_order
     [per_page, sort_by, order]
   end
+  
+  def do_association_method(id, association, assoc_ids, act)
+    object = @model[id]
+    klass = @model.association_reflection(association.to_sym)[:class_name].constantize
+    lookup = case act
+      when :add
+        :association_add_method_name
+      when :remove
+        :association_remove_method_name
+      end
+    method = @model.send(lookup, association)
+    assoc_ids.split(",").each do |assoc_id|
+      object.send(method, klass[assoc_id])
+    end
+  end
+    
 end

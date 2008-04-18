@@ -1,21 +1,23 @@
-function clickedTableRow(table_name) {
-  $(".active_admin_table").each(function(i, grid_element) {
-    var options = grid_element.p;
-    if (grid_element.id != ("table_" + table_name)) {
-      var association = options['association'];
-      var ids = getSelectedIDs(table_name);
-      var url = "<%= active_admin_home_url %>/" + table_name + "-to-" + association + "/" + ids[0];
-      thegrid = grid_element;
-      grid_element.p['url'] = url;
+// Populate other association tables when the main table is clicked
+function clickedMainTableRow(gridName) {
+  var ids = getSelectedIDs("#table_" + gridName);
+
+  $(".associate_context").hide();
+  $(".disassociate_context").show();
+  
+  // Loop through each flexigrid table that is NOT the main table, and
+  // reload the data now that we have an object to show associations for
+  $(".table_association").each(function(i, grid_element) {
+    if (ids.length > 0) {
+      grid_element.p.generateUrl(ids[0]);
       grid_element.grid.populate();
     }
   });
 }
 
-function getSelectedIDs(table_name) {
+function getSelectedIDs(wrapper) {
   var ids = [];
-  var rows = ".trSelected";
-  if (table_name) rows = "#table_" + table_name + " " + rows
+  var rows = (wrapper ? wrapper + " " : "") + ".trSelected";
   $(rows).each(function(i, row) {
     var match = row.id.match(/row(\d+)/)
     if( match ) ids.push(match[1]);
@@ -23,42 +25,108 @@ function getSelectedIDs(table_name) {
   return ids;
 }
 
-function faceboxForDelete(table_name) {
-  setFaceboxTableName(table_name, "confirmDelete");
-  var ids = getSelectedIDs();
+// Give instructions if necessary, or go on to delete
+function attemptDelete(tableName) {
+  var ids = getSelectedIDs("#main_wrapper");
+
+  // Global variable just for facebox
+  faceboxTableName = tableName;
   if( ids.length == 0 ) {
     $.facebox("Select one or more rows to delete, then click this 'Delete' button.");
   } else {
-    $.facebox($('#confirm-delete-rows-box'));
-  }
-}
-
-function faceboxForEdit(table_name) {
-  setFaceboxTableName(table_name, "editSelectedRow");
-  var ids = getSelectedIDs();
-  if( ids.length == 0 ) {
-    $.facebox("Select a row to edit, then click this 'Edit' button.");
-  } else if( ids.length == 1 ) {
-    window.location = "<%= active_admin_url(:edit) %>/" + ids[0];
-  } else {
-    $.facebox("More than one row has been selected.  Just pick one row and then click this 'Edit' button.");
+    $.facebox($('#confirm_delete_rows_box'));
   }
 }
 
 // Actually do the ajax call to delete rows
-function deleteSelectedRows(table_name) {
-  var ids = getSelectedIDs(table_name);
-  var url = "<%= active_admin_home_url %>/" + table_name + "/destroy/" + ids.join(",");
+function deleteSelectedRows(tableName) {
+  var ids = getSelectedIDs("#table_" + tableName);
+  var url = "<%= active_admin_home_url %>/" + tableName + "/destroy/" + ids.join(",");
   $.post(url, null, null, "json");
-  $("#table_" + table_name).flexReload();
+  $("#table_" + tableName).flexReload();
 }
 
-function setFaceboxTableName(table_name, callingFunction) {
-  if (!table_name) {
-    alert(callingFunction + " requires table_name");
-    return;
+// Give instructions if necessary, or go on to edit
+function attemptEdit(tableName) {
+  var ids = getSelectedIDs("#table_" + tableName);
+  if( ids.length == 1 ) {
+    window.location = "<%= active_admin_url(:edit) %>/" + ids[0];
   } else {
-    // Global variable just for facebox
-    faceboxTableName = table_name;
+    $.facebox(
+      "Select " + (ids.length == 0 ? "a" : "only one") +
+      " row, and then click the 'Edit' button.");
+  }
+}
+
+// Give instructions if necessary, or go on to associate
+function attemptAssociate(controller, association) {
+  var ids = getSelectedIDs("#table_" + association);
+  if( ids.length == 0 ) {
+    $.facebox("Select one or more rows to associate, then click the 'Associate' button.");
+  } else {
+    associateSelectedRows(controller, association, ids);
+  }
+}
+
+function associateSelectedRows(controller, association, ids) {
+  var mainIds = getSelectedIDs("#main_wrapper");
+  if (mainIds.length > 0) {
+    var mainId = mainIds[0];
+    var url = "/<%= active_admin_module %>/" + controller +
+              "/" + mainId + "/associate/" + association + "/" + ids.join(",");
+    $.post(url, function() { showAssociatedOnly(association) }, null, "json");
+  } else {
+    $.facebox("Main object not selected");
+  }
+}
+
+
+// Give instructions if necessary, or go on to disassociate
+function attemptDisassociate(controller, association) {
+  var ids = getSelectedIDs("#table_" + association);
+  if( ids.length == 0 ) {
+    $.facebox("Select one or more rows to disassociate, then click the 'Disassociate' button.");
+  } else {
+    disassociateSelectedRows(controller, association, ids);
+  }
+}
+
+function disassociateSelectedRows(controller, association, ids) {
+  var mainIds = getSelectedIDs("#main_wrapper");
+  if (mainIds.length > 0) {
+    var mainId = mainIds[0];
+    var url = "/<%= active_admin_module %>/" + controller +
+              "/" + mainId + "/disassociate/" + association + "/" + ids.join(",");
+    $.post(url, function() { showAssociatedOnly(association) }, null, "json");
+  } else {
+    $.facebox("Main object not selected");
+  }
+}
+
+function showAll(name) {
+  // We're going to show all objects in the table, so show the ASSOCIATE tools
+  $("#" + name + "_wrapper .associate_context").show();
+  $("#" + name + "_wrapper .disassociate_context").hide();
+
+  // Set the URL to normal data list and reload
+  $("#table_" + name).flexOptions({
+    url: "/" +
+      "<%= active_admin_module %>/" +
+      name + "/" + "list_data"
+  });
+  $("#table_" + name).flexReload();
+}
+
+function showAssociatedOnly(name) {
+  var ids = getSelectedIDs("#main_wrapper");
+
+  if (ids.length > 0) {
+    // We're going to show only associated objects in the table, so show the DISASSOCIATE tools
+    $("#" + name + "_wrapper .associate_context").hide();
+    $("#" + name + "_wrapper .disassociate_context").show();
+  
+    // Set the URL to list associated data and reload
+    $("#table_" + name)[0].p.generateUrl(ids[0]);
+    $("#table_" + name).flexReload();
   }
 }

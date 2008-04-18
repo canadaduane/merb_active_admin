@@ -13,39 +13,51 @@ module ActiveAdmin
     end
 
   protected
+
+    def active_admin_module
+      Merb::Plugins.config[:merb_active_admin][:base_path]
+    end
+    
+    def controller_for_model(model)
+      model.to_s.underscore.pluralize
+    end
+    
+    def module_and_controller_for_model(model)
+      active_admin_module + "/" + controller_for_model(model)
+    end
   
     # URL builder methods
   
     def active_admin_url(action, model = @model, kvs = {})
       kvs.delete_if{ |k, v| v.nil? }
-      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/#{model.to_s.downcase.pluralize}/#{action}" +
+      "/#{module_and_controller_for_model(model)}/#{action}" +
       (kvs.empty? ? "" : "?#{Merb::Request.params_to_query_string(kvs)}")
     end
 
     def active_admin_url_with_id(action, id, model = @model, kvs = {})
       kvs.delete_if{ |k, v| v.nil? }
-      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/#{model.to_s.downcase.pluralize}/#{action}/#{id}" +
+      "/#{module_and_controller_for_model(model)}/#{action}/#{id}" +
       (kvs.empty? ? "" : "?#{Merb::Request.params_to_query_string(kvs)}")
     end
     
     def active_admin_association_url(association, id, model = @model)
-      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/#{model.to_s.downcase.pluralize}-to-#{association}/#{id}"
+      "/#{module_and_controller_for_model(model)}-to-#{association}/#{id}"
     end
-    
+        
     def active_admin_home_url
-      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}"
+      "/#{active_admin_module}"
     end
 
     def active_admin_stylesheet_url(resource)
-      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/stylesheet/#{resource}"
+      "/#{active_admin_module}/stylesheet/#{resource}"
     end
 
     def active_admin_javascript_url(resource)
-      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/javascript/#{resource}"
+      "/#{active_admin_module}/javascript/#{resource}"
     end
 
     def active_admin_file_url(resource)
-      "/#{Merb::Plugins.config[:merb_active_admin][:base_path]}/public/#{resource}"
+      "/#{active_admin_module}/public/#{resource}"
     end
 
     # Helper methods
@@ -70,8 +82,12 @@ module ActiveAdmin
       sent_template
     end
     
-    def humanize(word)
+    def underscored_to_human_readable(word)
       word.to_s.gsub(/^[a-z]|(\_[a-z])/) { |a| a.upcase.gsub("_", " ") }.gsub(/Id$/, "ID")
+    end
+    
+    def camelized_to_human_readable(word)
+      underscored_to_human_readable( word.underscore )
     end
   end
 end

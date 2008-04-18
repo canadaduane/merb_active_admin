@@ -4,7 +4,7 @@
   <table class="active_admin_object_form">
     <%- @model.columns.reject{ |c| @model.primary_key == c }.each do |col| -%>
     <tr>
-      <td class="active_admin_object_key"><%= humanize(col) %></td>
+      <td class="active_admin_object_key"><%= underscored_to_human_readable(col) %></td>
       <td class="active_admin_object_value">
         <input type="text" name="object[<%= col %>]" value="<%= @object.send(col) %>">
       </td>

@@ -1,44 +1,33 @@
-
-<div id="confirm-delete-rows-box" class="dialog" style="display:none">
-  Are you sure you want to delete the row(s)?
-  <div class="footer">
-    <!-- <a href="#" class="close">&nbsp;</a> -->
-    <a href="#" onclick="$(document).trigger('close.facebox'); deleteSelectedRows(faceboxTableName); return false">Yes, Delete</a> |
-    <a href="#" onclick="$(document).trigger('close.facebox'); return false">Cancel</a>
-  </div>
-</div>
-
 <!-- Show the main data table for this model -->
-<%= active_admin_partial :data_table,
-      :name        => @model.table_name,
-      :model       => @model,
-      :data_url    => active_admin_url(:list_data),
-      :click_js    => "clickedTableRow('#{@model.table_name}');",
-      :association => false
+<%= active_admin_partial :list_main,
+      :name     => @model.table_name,
+      :model    => @model,
+      :data_url => active_admin_url(:list_data)
 %>
 
+<div class="associated_tables">
 <!-- Show data tables for each associated model (one_to_many, many_to_many) -->
 <%-
-# :type=>:many_to_many, :name=>:semesters, :block=>nil, :left_key=>:user_id, :join_table=>:enrollments, :right_key=>:semester_id, :class_name=>"enrollments"}
+# :type=>:many_to_many, :name=>:semesters, :block=>nil, :left_key=>:user_id, :join_table=>:enrollments, :right_key=>:semester_id, :class_name=>"Enrollment"}
   @model.associations.each do |assoc|
     reflect = @model.association_reflection(assoc)
     case reflect[:type]
     when :one_to_many, :many_to_many
       begin
         associated_model = reflect[:class_name].constantize
-        table = active_admin_partial :data_table,
-          :name        => reflect[:name],
-          :model       => associated_model,
-          :data_url    => false,
-          :click_js    => false,
-          :association => reflect[:name]
+        table = active_admin_partial :list_association,
+          :main_model       => @model,
+          :associated_model => associated_model,
+          :association_name => reflect[:name]
         concat table, binding
       rescue NameError => e
+        puts "NameError: #{e}"
         concat "<p>No model for <em>#{reflect[:class_name]}</em> (#{reflect[:type]})</p>", binding
       end
     end
   end
 -%>
+</div>
 
 <%- throw_content :for_head do -%>
   <script
@@ -52,3 +41,12 @@
     type="text/css" media="screen" title="Flexigrid CSS" charset="utf-8">
 <%- end -%>
 
+<!-- Facebox Dialogs -->
+<div id="confirm_delete_rows_box" class="dialog" style="display:none">
+  Are you sure you want to delete the row(s)?
+  <div class="footer">
+    <!-- <a href="#" class="close">&nbsp;</a> -->
+    <a href="#" onclick="$(document).trigger('close.facebox'); deleteSelectedRows(faceboxTableName); return false">Yes, Delete</a> |
+    <a href="#" onclick="$(document).trigger('close.facebox'); return false">Cancel</a>
+  </div>
+</div>

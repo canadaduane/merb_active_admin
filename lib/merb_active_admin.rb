@@ -55,14 +55,24 @@ if defined?(Merb::Plugins)
       r.match("/#{base_path}").
         to(:controller => "active_admin/base", :action => "index")
       
-      # List data for associations, e.g. /active_admin/users/to/posts/1+2+3
+      # List data for associations, e.g. /active_admin/users-to-posts/1,2
       r.match(%r{^/#{Regexp.escape(base_path)}/([^/]+)-to-([^/]+)/(.+)$}).
         to(:controller => "active_admin/[1]", :action => "list_association",
            :association => "[2]", :id => "[3]")
+
+      # Create associations, e.g. /active_admin/users/1/associate/posts/1,2,3
+      r.match(%r{^/#{Regexp.escape(base_path)}/([^/]+)/([^/]+)/associate/(\w+)/(.+)$}).
+        to(:controller => "active_admin/[1]", :action => "associate",
+           :id => "[2]", :association => "[3]", :assoc_ids => "[4]")
+
+      # Remove associations, e.g. /active_admin/users/1/disassociate/posts/1,2,3
+      r.match(%r{^/#{Regexp.escape(base_path)}/([^/]+)/([^/]+)/disassociate/(\w+)/(.+)$}).
+        to(:controller => "active_admin/[1]", :action => "disassociate",
+           :id => "[2]", :association => "[3]", :assoc_ids => "[4]")
       
-      # ... 'destroy' action with multiple ids, e.g. /active_admin/users/destroy/3+21
-      r.match(%r{^/#{Regexp.escape(base_path)}/([^/]+)/(destroy)/(.+)$}).
-        to(:controller => "active_admin/[1]", :action => "[2]", :ids => "[3]")
+      # ... 'destroy' action with multiple ids, e.g. /active_admin/users/destroy/3,21
+      r.match(%r{^/#{Regexp.escape(base_path)}/([^/]+)/destroy/(.+)$}).
+        to(:controller => "active_admin/[1]", :action => "destroy", :ids => "[3]")
 
       # ... actions without ID, e.g. /active_admin/users/list
       r.match("/#{base_path}/:controller/:action").
