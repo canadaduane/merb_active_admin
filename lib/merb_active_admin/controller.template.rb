@@ -93,13 +93,17 @@ class :controller_class < Base
     object = @model[id]
     klass = @model.association_reflection(association.to_sym)[:class_name].constantize
     lookup = case act
-      when :add
-        :association_add_method_name
-      when :remove
-        :association_remove_method_name
+      when :add    then :association_add_method_name
+      when :remove then :association_remove_method_name
       end
     method = @model.send(lookup, association)
     assoc_ids.split(",").each do |assoc_id|
+      # Don't add IDs that are already associated
+      if act == :add
+        joined = object.send("#{association}_dataset")
+        next if joined.filter("#{association}__id".to_sym => assoc_id).count > 0
+      end
+      # Add or remove this ID to/from the association
       object.send(method, klass[assoc_id])
     end
   end
