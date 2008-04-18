@@ -15,6 +15,14 @@ function clickedMainTableRow(gridName) {
   });
 }
 
+function activeAdminUrl(controller, action, id, additional) {
+  var url = "/<%= active_admin_module %>/" + controller;
+  if (action) url += "/" + action;
+  if (id) url += "/" + id;
+  if (additional) url += additional;
+  return url;
+}
+
 function getSelectedIDs(wrapper) {
   var ids = [];
   var rows = (wrapper ? wrapper + " " : "") + ".trSelected";
@@ -39,18 +47,18 @@ function attemptDelete(tableName) {
 }
 
 // Actually do the ajax call to delete rows
-function deleteSelectedRows(tableName) {
-  var ids = getSelectedIDs("#table_" + tableName);
-  var url = "<%= active_admin_home_url %>/" + tableName + "/destroy/" + ids.join(",");
+function deleteSelectedRows(name) {
+  var ids = getSelectedIDs("#table_" + name);
+  var url = activeAdminUrl(name, "destroy", ids.join(","));
   $.post(url, null, null, "json");
-  $("#table_" + tableName).flexReload();
+  $("#table_" + name).flexReload();
 }
 
 // Give instructions if necessary, or go on to edit
-function attemptEdit(tableName) {
-  var ids = getSelectedIDs("#table_" + tableName);
+function attemptEdit(name) {
+  var ids = getSelectedIDs("#table_" + name);
   if( ids.length == 1 ) {
-    window.location = "<%= active_admin_url(:edit) %>/" + ids[0];
+    window.location = activeAdminUrl(name, "edit", ids[0]);
   } else {
     $.facebox(
       "Select " + (ids.length == 0 ? "a" : "only one") +
@@ -110,9 +118,7 @@ function showAll(name) {
 
   // Set the URL to normal data list and reload
   $("#table_" + name).flexOptions({
-    url: "/" +
-      "<%= active_admin_module %>/" +
-      name + "/" + "list_data"
+    url: activeAdminUrl(name, "list_data")
   });
   $("#table_" + name).flexReload();
 }
