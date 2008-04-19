@@ -2,30 +2,30 @@
   <h1>
     
     <!-- Disassociate one or more of this table's rows from the main selected row -->
-    <div class="list_header_button disassociate_context disassociate_button">
+    <div class="list_header_button row_is_selected_context disassociate_button" style="display:none">
       <a href="#" onclick="attemptDisassociate('<%= controller_for_model(main_model) %>', '<%= association_name %>'); return false">
-        Disassociate
+        Remove
       </a>
     </div>
     
     <!-- Associate one or more of this table's rows with the main selected row -->
-    <div class="list_header_button associate_context associate_button" style="display:none">
+    <div class="list_header_button row_is_NOT_selected_context associate_button" style="display:none">
       <a href="#" onclick="attemptAssociate('<%= controller_for_model(main_model) %>', '<%= association_name %>'); return false">
-        Associate
+        Add
       </a>
     </div>
 
     <!-- Switch to 'associate' mode by showing all objects in this table -->
-    <div class="list_header_button disassociate_context show_all_button">
+    <div class="list_header_button row_is_selected_context show_all_button">
       <a href="#" onclick="showAll('<%= association_name %>'); return false">
         Show All
       </a>
     </div>
     
     <!-- Switch to 'disassociate' mode by showing only associated objects in this table -->
-    <div class="list_header_button associate_context associated_only_button" style="display:none">
-      <a href="#" onclick="showAssociatedOnly('<%= association_name %>'); return false">
-        Associated Only
+    <div class="list_header_button row_is_NOT_selected_context associated_only_button" style="display:none">
+      <a href="#" onclick="showOnlyAssociated('<%= association_name %>'); return false">
+        Show Only Associated
       </a>
     </div>
     

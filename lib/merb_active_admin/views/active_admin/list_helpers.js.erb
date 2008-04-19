@@ -1,9 +1,31 @@
+
+// Constructs a URL string
+function activeAdminUrl(controller, action, id, additional) {
+  var url = "/<%= active_admin_module %>/" + controller;
+  if (action) url += "/" + action;
+  if (id) url += "/" + id;
+  if (additional) url += additional;
+  return url;
+}
+
+// Gets the IDs of selected objects within the scope of +wrapper+.  If +wrapper+
+// is nil, then the whole document is used as the scope.
+function getSelectedIDs(wrapper) {
+  var ids = [];
+  var rows = (wrapper ? wrapper + " " : "") + ".trSelected";
+  $(rows).each(function(i, row) {
+    var match = row.id.match(/row(\d+)/)
+    if( match ) ids.push(match[1]);
+  });
+  return ids;
+}
+
 // Populate other association tables when the main table is clicked
 function clickedMainTableRow(gridName) {
   var ids = getSelectedIDs("#table_" + gridName);
 
-  $(".associate_context").hide();
-  $(".disassociate_context").show();
+  $(".row_is_NOT_selected_context").hide();
+  $(".row_is_selected_context").show();
   
   // Loop through each flexigrid table that is NOT the main table, and
   // reload the data now that we have an object to show associations for
@@ -13,24 +35,6 @@ function clickedMainTableRow(gridName) {
       grid_element.grid.populate();
     }
   });
-}
-
-function activeAdminUrl(controller, action, id, additional) {
-  var url = "/<%= active_admin_module %>/" + controller;
-  if (action) url += "/" + action;
-  if (id) url += "/" + id;
-  if (additional) url += additional;
-  return url;
-}
-
-function getSelectedIDs(wrapper) {
-  var ids = [];
-  var rows = (wrapper ? wrapper + " " : "") + ".trSelected";
-  $(rows).each(function(i, row) {
-    var match = row.id.match(/row(\d+)/)
-    if( match ) ids.push(match[1]);
-  });
-  return ids;
 }
 
 // Give instructions if necessary, or go on to delete
@@ -54,7 +58,7 @@ function deleteSelectedRows(name) {
   $("#table_" + name).flexReload();
 }
 
-// Give instructions if necessary, or go on to edit
+// Give instructions if necessary, or go on to the edit page
 function attemptEdit(name) {
   var ids = getSelectedIDs("#table_" + name);
   if( ids.length == 1 ) {
@@ -76,13 +80,14 @@ function attemptAssociate(controller, association) {
   }
 }
 
+// Actually do the ajax call to associate rows
 function associateSelectedRows(controller, association, ids) {
   var mainIds = getSelectedIDs("#main_wrapper");
   if (mainIds.length > 0) {
     var mainId = mainIds[0];
     var url = "/<%= active_admin_module %>/" + controller +
               "/" + mainId + "/associate/" + association + "/" + ids.join(",");
-    $.post(url, function() { showAssociatedOnly(association) }, null, "json");
+    $.post(url, function() { showOnlyAssociated(association) }, null, "json");
   } else {
     $.facebox("Main object not selected");
   }
@@ -99,22 +104,24 @@ function attemptDisassociate(controller, association) {
   }
 }
 
+// Actually do the ajax call to disassociate rows
 function disassociateSelectedRows(controller, association, ids) {
   var mainIds = getSelectedIDs("#main_wrapper");
   if (mainIds.length > 0) {
     var mainId = mainIds[0];
     var url = "/<%= active_admin_module %>/" + controller +
               "/" + mainId + "/disassociate/" + association + "/" + ids.join(",");
-    $.post(url, function() { showAssociatedOnly(association) }, null, "json");
+    $.post(url, function() { showOnlyAssociated(association) }, null, "json");
   } else {
     $.facebox("Main object not selected");
   }
 }
 
+// Change an association table from 'show only associated' to show all
 function showAll(name) {
   // We're going to show all objects in the table, so show the ASSOCIATE tools
-  $("#" + name + "_wrapper .associate_context").show();
-  $("#" + name + "_wrapper .disassociate_context").hide();
+  $("#" + name + "_wrapper .row_is_NOT_selected_context").show();
+  $("#" + name + "_wrapper .row_is_selected_context").hide();
 
   // Set the URL to normal data list and reload
   $("#table_" + name).flexOptions({
@@ -123,13 +130,14 @@ function showAll(name) {
   $("#table_" + name).flexReload();
 }
 
-function showAssociatedOnly(name) {
+// Change an association table from 'show all' to 'show only associated'
+function showOnlyAssociated(name) {
   var ids = getSelectedIDs("#main_wrapper");
 
   if (ids.length > 0) {
     // We're going to show only associated objects in the table, so show the DISASSOCIATE tools
-    $("#" + name + "_wrapper .associate_context").hide();
-    $("#" + name + "_wrapper .disassociate_context").show();
+    $("#" + name + "_wrapper .row_is_NOT_selected_context").hide();
+    $("#" + name + "_wrapper .row_is_selected_context").show();
   
     // Set the URL to list associated data and reload
     $("#table_" + name)[0].p.generateUrl(ids[0]);

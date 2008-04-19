@@ -1,0 +1,18 @@
+<h1>  
+  <!-- Disassociate one or more of this table's rows from the main selected row -->
+  <div class="list_header_button disassociate_button" style="display:none">
+    <a href="#" onclick="attemptDisassociate('<%= controller_for_model(main_model) %>', '<%= association_name %>'); return false">
+      Remove
+    </a>
+  </div>
+  
+  <!-- Associate one or more of this table's rows with the main selected row -->
+  <div class="list_header_button associate_button" style="display:none">
+    <a href="#" onclick="attemptAssociate('<%= controller_for_model(main_model) %>', '<%= association_name %>'); return false">
+      Add
+    </a>
+  </div>
+  
+  <!-- The name of this association -->
+  <%= camelized_to_human_readable( associated_model.to_s ) %>
+</h1>

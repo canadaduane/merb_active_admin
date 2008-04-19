@@ -11,19 +11,32 @@
 # :type=>:many_to_many, :name=>:semesters, :block=>nil, :left_key=>:user_id, :join_table=>:enrollments, :right_key=>:semester_id, :class_name=>"Enrollment"}
   @model.associations.each do |assoc|
     reflect = @model.association_reflection(assoc)
+
+    # Get the actual ruby class of the associated data
+    begin
+      associated_model = reflect[:class_name].constantize
+    rescue NameError => e
+      puts "NameError: #{e}"
+      concat "<p>No model for <em>#{reflect[:class_name]}</em> (#{reflect[:type]})</p>", binding
+    end
+
     case reflect[:type]
-    when :one_to_many, :many_to_many
-      begin
-        associated_model = reflect[:class_name].constantize
-        table = active_admin_partial :list_association,
+    when :many_to_one
+      single =
+        active_admin_partial :single_association,
           :main_model       => @model,
           :associated_model => associated_model,
           :association_name => reflect[:name]
-        concat table, binding
-      rescue NameError => e
-        puts "NameError: #{e}"
-        concat "<p>No model for <em>#{reflect[:class_name]}</em> (#{reflect[:type]})</p>", binding
-      end
+      concat single, binding
+    when :one_to_many, :many_to_many
+      table =
+        active_admin_partial :list_association,
+          :main_model       => @model,
+          :associated_model => associated_model,
+          :association_name => reflect[:name]
+      concat table, binding
+    else
+      concat "Association: #{reflect[:name]} of type #{reflect[:type]} not shown"
     end
   end
 -%>
