@@ -89,5 +89,18 @@ module ActiveAdmin
     def camelized_to_human_readable(word)
       underscored_to_human_readable( word.underscore )
     end
+    
+    def column_type(model, column)
+      model.schema.create_info.first.find{ |c| c[:name] == column.to_sym }[:type]
+    end
+    
+    def column_width(model, column)
+      case column_type(model, column)
+      when :string  then 100
+      when :text    then 160
+      when :integer then 35
+      else               100
+      end
+    end
   end
 end

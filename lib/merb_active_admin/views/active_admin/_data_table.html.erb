@@ -3,7 +3,7 @@
   <thead>
     <tr>
       <%- model.columns.each do |col| -%>
-      <th abbr="<%= col %>" width="<%= col.to_s == "id" ? 35 : 100 %>"><%= underscored_to_human_readable(col) %></th>
+      <th abbr="<%= col %>" width="<%= column_width(model, col) %>"><%= underscored_to_human_readable(col) %></th>
       <%- end -%>
     </tr>
   </thead>
