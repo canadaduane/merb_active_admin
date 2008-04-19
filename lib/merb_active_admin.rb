@@ -72,7 +72,7 @@ if defined?(Merb::Plugins)
       
       # ... 'destroy' action with multiple ids, e.g. /active_admin/users/destroy/3,21
       r.match(%r{^/#{Regexp.escape(base_path)}/([^/]+)/destroy/(.+)$}).
-        to(:controller => "active_admin/[1]", :action => "destroy", :ids => "[3]")
+        to(:controller => "active_admin/[1]", :action => "destroy", :ids => "[2]")
 
       # ... actions without ID, e.g. /active_admin/users/list
       r.match("/#{base_path}/:controller/:action").
