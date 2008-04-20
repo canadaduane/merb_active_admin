@@ -33,6 +33,18 @@ class :controller_class < Base
     end
   end
   
+  def single_association(id, association)
+    if first_object = @model[id]
+      if @object = first_object.send(association)
+        active_admin_render(:show, "html", false)
+      else
+        ""
+      end
+    else
+      ""
+    end
+  end
+  
   def associate(id, association, assoc_ids)
     do_association_method(id, association, assoc_ids, :add)
     %({message: "ok"})

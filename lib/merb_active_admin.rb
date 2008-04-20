@@ -55,6 +55,11 @@ if defined?(Merb::Plugins)
       r.match("/#{base_path}").
         to(:controller => "active_admin/base", :action => "index")
       
+      # Single data for associations, e.g. /active_admin/users/1/single/account
+      r.match(%r{^/#{Regexp.escape(base_path)}/([^/]+)/([^/]+)/single/(.+)$}).
+        to(:controller => "active_admin/[1]", :action => "single_association",
+           :id => "[2]", :association => "[3]")
+      
       # List data for associations, e.g. /active_admin/users-to-posts/1,2
       r.match(%r{^/#{Regexp.escape(base_path)}/([^/]+)-to-([^/]+)/(.+)$}).
         to(:controller => "active_admin/[1]", :action => "list_association",

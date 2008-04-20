@@ -1,11 +1,8 @@
 
 // Constructs a URL string
-function activeAdminUrl(controller, action, id, additional) {
-  var url = "/<%= active_admin_module %>/" + controller;
-  if (action) url += "/" + action;
-  if (id) url += "/" + id;
-  if (additional) url += additional;
-  return url;
+function activeAdminUrl() {
+  return "/<%= active_admin_module %>" +
+    jQuery.map(arguments, function(n) { return "/" + n; }).join("");
 }
 
 // Gets the IDs of selected objects within the scope of +wrapper+.  If +wrapper+
@@ -21,20 +18,27 @@ function getSelectedIDs(wrapper) {
 }
 
 // Populate other association tables when the main table is clicked
-function clickedMainTableRow(gridName) {
-  var ids = getSelectedIDs("#table_" + gridName);
+function clickedMainTableRow(name) {
+  var ids = getSelectedIDs("#table_" + name);
 
-  $(".row_is_NOT_selected_context").hide();
-  $(".row_is_selected_context").show();
+  if (ids.length > 0) {
+    $(".row_is_NOT_selected_context").hide();
+    $(".row_is_selected_context").show();
   
-  // Loop through each flexigrid table that is NOT the main table, and
-  // reload the data now that we have an object to show associations for
-  $(".table_association").each(function(i, grid_element) {
-    if (ids.length > 0) {
+    // Loop through each flexigrid table that is NOT the main table, and
+    // reload the data now that we have an object to show associations for
+    $(".table_association").each(function(i, grid_element) {
       grid_element.p.generateUrl(ids[0]);
       grid_element.grid.populate();
-    }
-  });
+    });
+  
+    // Loop through each many-to-one association and show the assoc. object
+    $(".single_association_data").each(function(i, div) {
+      var assoc_name = div.id.match(/^(.+)_data$/)[1];
+      var url = activeAdminUrl(name, ids[0], 'single', assoc_name);
+      $.get(url, function(response) { div.innerHTML = response; });
+    });
+  }
 }
 
 // Give instructions if necessary, or go on to delete
