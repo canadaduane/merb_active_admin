@@ -2,7 +2,7 @@
   <!-- Header Row -->
   <thead>
     <tr>
-      <%- model.columns.each do |col| -%>
+      <%- non_id_columns(model).each do |col| -%>
       <th abbr="<%= col %>" width="<%= column_width(model, col) %>"><%= underscored_to_human_readable(col) %></th>
       <%- end -%>
     </tr>

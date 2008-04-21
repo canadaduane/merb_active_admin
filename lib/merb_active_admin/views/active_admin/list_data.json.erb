@@ -4,7 +4,7 @@
     "rows"  =>
       @objects.map{ |o|
         { "id"   => o.id,
-          "cell" => @model.columns.map{ |c| o.send( c ) }
+          "cell" => non_id_columns(@model).map{ |c| o.send( c ) }
         }
       }
   }.to_json
