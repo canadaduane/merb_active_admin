@@ -4,9 +4,18 @@
   <table class="active_admin_object_form">
     <%- @model.columns.reject{ |c| @model.primary_key == c }.each do |col| -%>
     <tr>
-      <td class="active_admin_object_key"><%= underscored_to_human_readable(col) %></td>
-      <td class="active_admin_object_value">
-        <input type="text" name="object[<%= col %>]" value="<%= @object.send(col) %>">
+      <td class="active_admin_object_key" valign="top">
+        <%= underscored_to_human_readable(col) %>
+      </td>
+      <td class="active_admin_object_value" valign="top">
+        <%- case column_type(@model, col) -%>
+        <%- when :integer -%>
+          <input type="text" name="object[<%= col %>]" value="<%= @object.send(col) %>" size="5">
+        <%- when :string -%>
+          <input type="text" name="object[<%= col %>]" value="<%= @object.send(col) %>" size="20">
+        <%- when :text -%>
+          <textarea name="object[<%= col %>]" rows="8" cols="20"><%= @object.send(col) %></textarea>
+        <%- end -%>
       </td>
     </tr>
     <%- end -%>

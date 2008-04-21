@@ -2,7 +2,6 @@
   <a href="#" onclick="removeSingle('<%= @association %>'); return false">Remove</a>
 </div>
 
-<div style="clear:both"></div>
 <%- @object.class.columns.reject{ |c| @object.class.primary_key == c }.each do |col| -%>
 <div class="active_admin_object_property">
   <em><%= underscored_to_human_readable(col) %></em> :
