@@ -1,15 +1,8 @@
 <div id="<%= association_name %>_wrapper">
   <h2>  
-    <!-- Disassociate one or more of this table's rows from the main selected row -->
-    <div class="list_header_button remove_single_button" style="display:none">
-      <a href="#" onclick="removeSingle('<%= controller_for_model(main_model) %>', '<%= association_name %>'); return false">
-        Remove
-      </a>
-    </div>
-  
     <!-- Associate one or more of this table's rows with the main selected row -->
     <div class="list_header_button choose_single_button" style="display:none">
-      <a href="#" onclick="chooseSingle('<%= controller_for_model(main_model) %>', '<%= association_name %>'); return false">
+      <a href="#" onclick="chooseSingle(controller, '<%= association_name %>'); return false">
         Choose
       </a>
     </div>

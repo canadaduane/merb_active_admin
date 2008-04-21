@@ -34,6 +34,7 @@ class :controller_class < Base
   end
   
   def single_association(id, association)
+    @association = association
     if first_object = @model[id]
       if @object = first_object.send(association)
         active_admin_render(:show, "html", false)
@@ -102,21 +103,34 @@ class :controller_class < Base
   end
   
   def do_association_method(id, association, assoc_ids, act)
-    object = @model[id]
-    klass = @model.association_reflection(association.to_sym)[:class_name].constantize
-    lookup = case act
-      when :add    then :association_add_method_name
-      when :remove then :association_remove_method_name
+    if object = @model[id]
+      reflect = @model.association_reflection(association.to_sym)
+      case reflect[:type]
+      when :many_to_one
+        case act
+        when :add    then object.send("#{association}=", assoc_ids)
+        when :remove then object.send("#{association}=", nil)
+        end
+        object.save
+      when :one_to_many, :many_to_many
+        klass = reflect[:class_name].constantize
+        lookup = case act
+          when :add    then :association_add_method_name
+          when :remove then :association_remove_method_name
+          end
+        method = @model.send(lookup, association)
+        assoc_ids.split(",").each do |assoc_id|
+          # Don't add IDs that are already associated
+          if act == :add
+            joined = object.send("#{association}_dataset")
+            next if joined.filter("#{association}__id".to_sym => assoc_id).count > 0
+          end
+          # Add or remove this ID to/from the association
+          object.send(method, klass[assoc_id])
+        end
       end
-    method = @model.send(lookup, association)
-    assoc_ids.split(",").each do |assoc_id|
-      # Don't add IDs that are already associated
-      if act == :add
-        joined = object.send("#{association}_dataset")
-        next if joined.filter("#{association}__id".to_sym => assoc_id).count > 0
-      end
-      # Add or remove this ID to/from the association
-      object.send(method, klass[assoc_id])
+    else
+      # id not found
     end
   end
     

@@ -34,11 +34,19 @@ function clickedMainTableRow(name) {
   
     // Loop through each many-to-one association and show the assoc. object
     $(".single_association_data").each(function(i, div) {
-      var assoc_name = div.id.match(/^(.+)_data$/)[1];
-      var url = activeAdminUrl(name, ids[0], 'single', assoc_name);
-      $.get(url, function(response) { div.innerHTML = response; });
+      // First clear out the div so it doesn't flicker (as much)
+      div.innerHTML = "";
+      // Go fetch the new associated object, if any
+      showSingle(ids[0], div.id.match(/^(.+)_data$/)[1]);
     });
   }
+}
+
+function showSingle(id, association) {
+  var div = $("#" + association + "_data");
+  var url = activeAdminUrl(controller, id, 'single', association);
+  $.get(url, function(response) { div.html(response); });
+  
 }
 
 // Give instructions if necessary, or go on to delete
@@ -146,5 +154,16 @@ function showOnlyAssociated(name) {
     // Set the URL to list associated data and reload
     $("#table_" + name)[0].p.generateUrl(ids[0]);
     $("#table_" + name).flexReload();
+  }
+}
+
+function removeSingle(association) {
+  var mainIds = getSelectedIDs("#main_wrapper");
+  if (mainIds.length > 0) {
+    var url = activeAdminUrl(controller, mainIds[0], "disassociate", association, "one");
+    $.post(url, function() {  }, null, "json");
+    $("#" + association + "_data").html("");
+  } else {
+    $.facebox("Main object not selected");
   }
 }

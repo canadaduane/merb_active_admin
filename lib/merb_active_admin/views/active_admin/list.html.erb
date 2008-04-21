@@ -43,6 +43,9 @@
 </div>
 
 <%- throw_content :for_head do -%>
+  <script type="text/javascript" charset="utf-8">
+    var controller = "<%= controller_for_model( @model ) %>";
+  </script>
   <script
     src="<%= active_admin_file_url("flexigrid/flexigrid.js") %>"
     type="text/javascript" charset="utf-8"></script>
