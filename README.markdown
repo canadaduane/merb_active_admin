@@ -14,7 +14,7 @@ Three steps:
 
 As with all Merb gem plugins, you can install merb_active_admin in either your system gem repository or your application's gem repository.  Here's an example of downloading and installing it in your app's gems folder:
 
-    $ wget http://github.com/canadaduane/merb_active_admin/tree/master/pkg/merb_active_admin-0.3.gem?raw=true
+    $ wget http://github.com/canadaduane/merb_active_admin/tree/master/pkg/merb_active_admin-0.3.gem?raw=true -O merb_active_admin-0.3.gem
     $ cd my_merb_app
     $ mkdir gems
     $ gem install ../merb_active_admin-0.3.gem -l -i ./gems
@@ -22,7 +22,10 @@ As with all Merb gem plugins, you can install merb_active_admin in either your s
 Now on to step 3: Add the line "include ActiveAdmin" to each of the Sequel models that you want available in ActiveAdmin.  For example, here is an example from app/models/assignment.rb:
 
     class Assignment < Sequel::Model(:assignments)
+    
+      # Add This Line ==>
       include ActiveAdmin
+    
       set_schema do
         integer :id, :primary_key => true, :auto_increment => true
         string  :name, :unique => true, :null => false
