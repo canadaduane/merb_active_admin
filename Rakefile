@@ -3,7 +3,7 @@ require 'rake/gempackagetask'
 
 PLUGIN = "merb_active_admin"
 NAME = "merb_active_admin"
-VERSION = "0.0.1"
+VERSION = "0.3"
 AUTHOR = "Duane Johnson"
 EMAIL = "duane.johnson@gmail.com"
 HOMEPAGE = "http://merb-plugins.rubyforge.org/merb_active_admin/"
@@ -14,7 +14,7 @@ spec = Gem::Specification.new do |s|
   s.version = VERSION
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
-  s.extra_rdoc_files = ["README", "LICENSE", 'TODO']
+  s.extra_rdoc_files = ["README.markdown", "LICENSE"]
   s.summary = SUMMARY
   s.description = s.summary
   s.author = AUTHOR
@@ -23,7 +23,7 @@ spec = Gem::Specification.new do |s|
   s.add_dependency('merb-core', '>= 0.9.0')
   s.require_path = 'lib'
   s.autorequire = PLUGIN
-  s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs}/**/*")
+  s.files = %w(LICENSE README.markdown Rakefile) + Dir.glob("{lib,specs}/**/*")
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|
